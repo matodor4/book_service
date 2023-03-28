@@ -1,7 +1,10 @@
 package server
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
 	"net/http"
 	"test_1/internal/service"
 )
@@ -18,13 +21,24 @@ func RegisterControllers(group *gin.RouterGroup, service *service.Service) error
 
 	ctl := NewController(service)
 
+	group.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	group.GET("/books", ctl.getBooks)
 	group.DELETE("/book", ctl.deleteBookByID)
 
 	return nil
 }
 
+// getBooks получение списка книг
+// @Description получение списка книг.
+// @Accept json
+// @Produce json
+// @Success 200 {object} []domain.Book
+// @Failure 400
+// @Failure 500
+// @Router /v1/books [GET].
 func (ctl Controller) getBooks(c *gin.Context) {
+	fmt.Println("Hello World! ")
 	books, err := ctl.service.Repo.GetBooks(c)
 
 	if err != nil {
@@ -43,6 +57,15 @@ type deleteBookRequest struct {
 	ID string `json:"id"`
 }
 
+// deleteBookByID удаление книги по ID
+// @Description удаление книги по ID
+// @Accept json
+// @Produce json
+// @Success 200
+// @Param search body deleteBookRequest true "Search request"
+// @Failure 400
+// @Failure 500
+// @Router /v1/book [DELETE].
 func (ctl Controller) deleteBookByID(c *gin.Context) {
 	var req deleteBookRequest
 

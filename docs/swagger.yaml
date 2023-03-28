@@ -1,0 +1,58 @@
+definitions:
+  domain.Book:
+    properties:
+      id:
+        type: string
+      publisherYear:
+        type: string
+      title:
+        type: string
+    type: object
+  server.deleteBookRequest:
+    properties:
+      id:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/book:
+    delete:
+      consumes:
+      - application/json
+      description: удаление книги по ID
+      parameters:
+      - description: Search request
+        in: body
+        name: search
+        required: true
+        schema:
+          $ref: '#/definitions/server.deleteBookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+        "500":
+          description: ""
+  /v1/books:
+    get:
+      consumes:
+      - application/json
+      description: получение списка книг.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Book'
+            type: array
+        "400":
+          description: ""
+        "500":
+          description: ""
+swagger: "2.0"

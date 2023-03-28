@@ -7,9 +7,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	_ "test_1/docs"
 	"test_1/internal/repository"
 	"test_1/internal/server"
-	service2 "test_1/internal/service"
+	"test_1/internal/service"
 )
 
 func main() {
@@ -22,23 +23,25 @@ func main() {
 
 	repo := repository.New()
 
-	service := service2.NewService(repo)
+	bookService := service.NewService(repo)
 
 	ginRouter := createGINRouter()
 
-	err = server.RegisterControllers(ginRouter.Group("/v1"), service)
+	err = server.RegisterControllers(ginRouter.Group("/v1"), bookService)
 
 	if err != nil {
 		logger.WithError(err).Fatal("failed to register controller")
 	}
 
+	addr := cfg.Address + ":" + cfg.Port
+
 	server := http.Server{
-		Addr:    cfg.Address + ":" + cfg.Port,
+		Addr:    addr,
 		Handler: ginRouter,
 	}
 
 	go func() {
-		logger.Info("start book service")
+		logger.Info("start book bookService")
 
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Fatalf("debug listen and serve error: %+v", err)
@@ -49,7 +52,7 @@ func main() {
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	<-shutdown
-	logger.Info("stop book service")
+	logger.Info("stop book bookService")
 
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.GracefulShutdownTimeout)
 	defer cancel()

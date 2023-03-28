@@ -8,17 +8,15 @@ import (
 )
 
 const (
-	// RequestIDHeader stores HTTP-header name to pass the requestID.
-	RequestIDHeader = "x-request-id"
-	rps             = 10
-	timeout         = time.Second * 5
+	rps = 10
 )
 
 func RPSLimiter() gin.HandlerFunc {
-	requests := make(chan time.Time, 10)
+	requests := make(chan time.Time, rps)
 
 	go func() {
 		for t := range time.Tick(time.Second / rps) {
+
 			requests <- t
 		}
 	}()
@@ -27,8 +25,6 @@ func RPSLimiter() gin.HandlerFunc {
 		select {
 		case <-requests:
 			c.Next()
-		case <-time.After(timeout):
-			c.AbortWithError(http.StatusGatewayTimeout, errors.New("timeout waiting"))
 		default:
 			c.AbortWithError(http.StatusTooManyRequests, errors.New("too many requests"))
 		}
