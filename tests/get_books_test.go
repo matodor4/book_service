@@ -6,10 +6,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"test_1/internal/domain"
+	"test_1/internal/repository"
 	"test_1/internal/server"
 	service2 "test_1/internal/service"
 	"testing"
-	"time"
 )
 
 func Test_GetBooks(t *testing.T) {
@@ -20,7 +20,7 @@ func Test_GetBooks(t *testing.T) {
 
 	router, serv := httpServer(t)
 	defer serv.Close()
-	err := server.RegisterControllers(router.Group("/v1"), service)
+	err := server.RegisterControllers(router, service)
 	if err != nil {
 		t.Error(err)
 	}
@@ -44,7 +44,7 @@ func Test_GetBooks(t *testing.T) {
 		{
 			name: "bad request - empty storage",
 			input: input{
-				query:  "/v1/books",
+				query:  "/books",
 				result: nil,
 				svcErr: errors.New("no books find"),
 			},
@@ -56,23 +56,9 @@ func Test_GetBooks(t *testing.T) {
 		{
 			name: "ok request",
 			input: input{
-				query: "/v1/books",
+				query: "/books",
 				result: []domain.Book{
-					{
-						ID:            "1",
-						Title:         "title_1",
-						PublisherYear: time.Now(),
-					},
-					{
-						ID:            "2",
-						Title:         "title_2",
-						PublisherYear: time.Now(),
-					},
-					{
-						ID:            "3",
-						Title:         "title_3",
-						PublisherYear: time.Now(),
-					},
+					repository.BookOne, repository.BookTwo, repository.BookThree,
 				},
 				svcErr: nil,
 			},

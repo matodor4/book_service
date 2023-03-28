@@ -5,30 +5,37 @@ import (
 	"errors"
 	"sync"
 	"test_1/internal/domain"
-	"time"
 )
 
+// BookList for test too
 var bookList = map[string]domain.Book{
-	"1": {
-		ID:            "1",
-		Title:         "title_1",
-		PublisherYear: time.Now(),
-	},
-	"2": {
-		ID:            "2",
-		Title:         "title_2",
-		PublisherYear: time.Now(),
-	},
-	"3": {
-		ID:            "3",
-		Title:         "title_3",
-		PublisherYear: time.Now(),
-	},
+	"1": BookOne,
+	"2": BookTwo,
+	"3": BookThree,
+}
+
+var BookOne = domain.Book{
+	ID:            "1",
+	Title:         "The Hitchhiker's Guide to the Galaxy",
+	Author:        "Douglas Adams",
+	PublisherYear: "1979",
+}
+var BookTwo = domain.Book{
+	ID:            "2",
+	Title:         "Pride and Prejudice",
+	Author:        "Jane Austen",
+	PublisherYear: "1979",
+}
+var BookThree = domain.Book{
+	ID:            "3",
+	Title:         "To Kill a Mockingbird",
+	Author:        "Harper Lee",
+	PublisherYear: "1960",
 }
 
 var storage = SafeKeyValueStore{
 	data: bookList,
-	mux:  sync.Mutex{},
+	mux:  &sync.Mutex{},
 }
 
 type BookRepo struct {

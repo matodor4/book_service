@@ -16,7 +16,7 @@ func NewController(s *service.Service) *Controller {
 	return &Controller{service: s}
 }
 
-func RegisterControllers(group *gin.RouterGroup, service *service.Service) error {
+func RegisterControllers(group *gin.Engine, service *service.Service) error {
 
 	ctl := NewController(service)
 
@@ -67,7 +67,7 @@ type deleteBookRequest struct {
 func (ctl Controller) deleteBookByID(c *gin.Context) {
 	var req deleteBookRequest
 
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		_ = c.AbortWithError(http.StatusBadRequest, err)
 
 		return
@@ -76,7 +76,7 @@ func (ctl Controller) deleteBookByID(c *gin.Context) {
 	err := ctl.service.Repo.DeleteBookByID(c, req.ID)
 
 	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		_ = c.AbortWithError(http.StatusBadRequest, err)
 
 		return
 	}

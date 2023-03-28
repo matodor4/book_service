@@ -1,7 +1,10 @@
 package tests
 
 import (
+	"bytes"
 	"errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"test_1/internal/server"
 	service2 "test_1/internal/service"
@@ -17,7 +20,7 @@ func Test_DeleteBook(t *testing.T) {
 	router, serv := httpServer(t)
 	defer serv.Close()
 
-	err := server.RegisterControllers(router.Group("/v1"), service)
+	err := server.RegisterControllers(router, service)
 	if err != nil {
 		t.Error(err)
 	}
@@ -33,7 +36,6 @@ func Test_DeleteBook(t *testing.T) {
 	}
 
 	type output struct {
-		//body string
 		code int
 	}
 
@@ -50,8 +52,7 @@ func Test_DeleteBook(t *testing.T) {
 				svcErr: errors.New("no books find"),
 			},
 			output: output{
-				//body: `{"error":"no books find","code":"BAD_REQUEST"}`,
-				code: http.StatusNotFound,
+				code: http.StatusBadRequest,
 			},
 		},
 		{
@@ -59,30 +60,31 @@ func Test_DeleteBook(t *testing.T) {
 			input: input{
 				query:  "/v1/book",
 				result: req{id: 1},
+				svcErr: nil,
 			},
 			output: output{
-				//body: `{"error":"no books find","code":"BAD_REQUEST"}`,
-				code: http.StatusOK,
+				code: http.StatusNoContent,
 			},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			repo.GetBookError = test.input.svcErr
-			//repo.GetBooksResult = test.input.result
-			t.Log("URL", serv.URL+test.input.query)
+			repo.DeleteBooksError = test.input.svcErr
 
 			if err != nil {
 				t.Fatal(err)
 			}
+			req, err := http.NewRequest(http.MethodDelete, serv.URL+"/book", bytes.NewReader([]byte(`{"id": 1}`)))
+			if err != nil {
+				t.Error(err)
+			}
+			resp, err := serv.Client().Do(req)
+			require.NoError(t, err, "client request")
 
-			//resp, err := serv.Client().Do(req)
-			//require.NoError(t, err, "client request")
-			//
-			//defer resp.Body.Close()
-			//
-			//assert.Equal(t, test.output.code, resp.StatusCode)
+			defer resp.Body.Close()
+
+			assert.Equal(t, test.output.code, resp.StatusCode)
 		})
 	}
 }

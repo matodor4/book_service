@@ -7,7 +7,7 @@ import (
 
 type SafeKeyValueStore struct {
 	data map[string]domain.Book
-	mux  sync.Mutex
+	mux  *sync.Mutex
 }
 
 func (store *SafeKeyValueStore) Put(key string, value domain.Book) {

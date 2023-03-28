@@ -21,3 +21,9 @@ test: ## Run unit (short) tests
 docs: ## Generate swagger docs
 	swag init -g cmd/${PACKAGE}/main.go
 
+.PHONY: lint
+lint:
+	$(info $(M) running linters...)
+	golangci-lint --version
+	golangci-lint run --timeout 5m0s -v ./...
+

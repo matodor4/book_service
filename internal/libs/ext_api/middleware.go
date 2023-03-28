@@ -23,7 +23,7 @@ func RPSLimiter() gin.HandlerFunc {
 
 	ticker := time.NewTicker(time.Second)
 	go func() {
-		for _ = range ticker.C {
+		for range ticker.C {
 			for i := 0; i < rps; i++ {
 				select {
 				case requests <- struct{}{}:
@@ -38,7 +38,7 @@ func RPSLimiter() gin.HandlerFunc {
 		case <-requests:
 			c.Next()
 		default:
-			c.AbortWithError(http.StatusTooManyRequests, errors.New("too many requests"))
+			c.AbortWithError(http.StatusTooManyRequests, errors.New("too many requests")) //nolint
 		}
 	}
 }

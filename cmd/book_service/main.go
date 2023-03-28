@@ -27,7 +27,7 @@ func main() {
 
 	ginRouter := createGINRouter()
 
-	err = server.RegisterControllers(ginRouter.Group("/v1"), bookService)
+	err = server.RegisterControllers(ginRouter, bookService)
 
 	if err != nil {
 		logger.WithError(err).Fatal("failed to register controller")
