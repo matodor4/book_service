@@ -12,12 +12,24 @@ const (
 )
 
 func RPSLimiter() gin.HandlerFunc {
-	requests := make(chan time.Time, rps)
+	requests := make(chan struct{}, rps)
 
+	for i := 0; i < rps; i++ {
+		select {
+		case requests <- struct{}{}:
+		default:
+		}
+	}
+
+	ticker := time.NewTicker(time.Second)
 	go func() {
-		for t := range time.Tick(time.Second / rps) {
-
-			requests <- t
+		for _ = range ticker.C {
+			for i := 0; i < rps; i++ {
+				select {
+				case requests <- struct{}{}:
+				default:
+				}
+			}
 		}
 	}()
 

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
@@ -38,7 +37,6 @@ func RegisterControllers(group *gin.RouterGroup, service *service.Service) error
 // @Failure 500
 // @Router /v1/books [GET].
 func (ctl Controller) getBooks(c *gin.Context) {
-	fmt.Println("Hello World! ")
 	books, err := ctl.service.Repo.GetBooks(c)
 
 	if err != nil {

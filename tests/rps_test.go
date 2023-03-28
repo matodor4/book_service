@@ -12,6 +12,10 @@ import (
 )
 
 func Test_RSP(t *testing.T) {
+	takes := 11
+	rps := 10
+	countOverRPS := takes - rps
+
 	repo := NewMockRepo()
 
 	service := service2.NewService(repo)
@@ -28,11 +32,6 @@ func Test_RSP(t *testing.T) {
 	type input struct {
 		query  string
 		result []domain.Book
-	}
-
-	type output struct {
-		//body string
-		code int
 	}
 
 	tests := []struct {
@@ -65,7 +64,7 @@ func Test_RSP(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		for i := 0; i < 21; i++ {
+		for i := 0; i < takes; i++ {
 
 			t.Run(test.name, func(t *testing.T) {
 
@@ -83,9 +82,11 @@ func Test_RSP(t *testing.T) {
 				require.NoError(t, err, "client request")
 
 				defer resp.Body.Close()
-				time.Sleep(time.Second / 10)
 			})
-			t.Log("count ", count)
+		}
+
+		if count != countOverRPS {
+			t.Errorf("rps count error: wanr %v but got %v", 1, count)
 		}
 	}
 }
